@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#wget https://raw.githubusercontent.com/maemune/ubuntu/main/setup/root.sh && nano ./root.sh && chmod u+x ./root.sh && ./root.sh
+
+# Setting you info
+GITHUB_KEYS_URL="https://github.com/maemune.keys"
+PASSWORD=""
+
 # Update
 apt-get update
 apt -y full-upgrade
@@ -90,11 +96,11 @@ fi
 # UserCreate
 adduser -q --gecos "" --disabled-password ubuntu
 usermod -aG sudo ubuntu
-echo -e "PASSWORD\nPASSWORD\n" | passwd ubuntu
+echo -e "${PASSWORD}\n${PASSWORD}\n" | passwd ubuntu
 
 # User SSH Setup
 mkdir ~/.ssh
-curl https://github.com/maemune.keys >> ~/.ssh/authorized_keys
+curl ${GITHUB_KEYS_URL} >> ~/.ssh/authorized_keys
 chmod 600 .ssh/authorized_keys
 
 mkdir -p /home/ubuntu/.ssh
@@ -103,7 +109,7 @@ install -m 600 -o ubuntu -g ubuntu ~/.ssh/authorized_keys /home/ubuntu/.ssh/auth
 systemctl restart sshd.service
 
 crontab -l > {tmpfile}
-echo "*/5 * * * * rm /root/.ssh/authorized_keys /home/ubuntu/.ssh/authorized_keys && curl https://github.com/maemune.keys >> /root/.ssh/authorized_keys && cp /root/.ssh/authorized_keys /home/ubuntu/.ssh/authorized_keys && chown -R ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys && chmod 600 /home/ubuntu/.ssh/authorized_keys" >> {tmpfile}
+echo "*/5 * * * * rm /root/.ssh/authorized_keys /home/ubuntu/.ssh/authorized_keys && curl ${GITHUB_KEYS_URL} >> /root/.ssh/authorized_keys && cp /root/.ssh/authorized_keys /home/ubuntu/.ssh/authorized_keys && chown -R ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys && chmod 600 /home/ubuntu/.ssh/authorized_keys" >> {tmpfile}
 crontab {tmpfile}
 rm {tmpfile}
 
